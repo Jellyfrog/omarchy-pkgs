@@ -1,0 +1,71 @@
+# Maintainer: Joshua Warren <816217+joshuaswarren@users.noreply.github.com>
+
+pkgname=omarchy-ane-dkms
+_srcname=omarchy-ane
+pkgver=0.3.0
+pkgrel=1
+pkgdesc='Apple Neural Engine driver for Apple Silicon Macs (DKMS)'
+arch=('aarch64')
+groups=('omarchy-platform-apple-silicon')
+url='https://github.com/joshuaswarren/omarchy-ane'
+license=('GPL-2.0-only OR MIT')
+# dtc 1.7.1 is the first release that keeps a labelled node's phandle when it
+# applies an overlay (libfdt 1fad0650, 61e88fdc). Arch's dtc carries epoch 1.
+depends=('dkms' 'dtc>=1:1.7.1' 'python')
+makedepends=('dtc')
+checkdepends=('fakeroot' 'linux-aurora-headers')
+optdepends=('linux-aurora-headers: build the modules for linux-aurora'
+            'linux-asahi-headers: build the modules for linux-asahi')
+# ANE_ABI_MAJOR of ane.ko (ane/src/uapi/drm/ane_accel.h). omarchy-mlx depends on
+# the ABI, not on a package version.
+provides=('omarchy-ane-abi=1')
+# ane_t6021 stays blocked until omarchy-ane-m2-enable edits this file.
+backup=('etc/modprobe.d/ane_t6021.conf')
+install=omarchy-ane-dkms.install
+source=("$_srcname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('1533e555dcff5c2392ffb460480991fe989e1a8534dc6907c421c972a674a9b1')
+
+prepare() {
+  # The DKMS source tree: dkms.conf, ane/Makefile, ane/src/ and ane/t6021/.
+  # PACKAGE_VERSION becomes /sys/module/ane/version.
+  local src="$_srcname-$pkgver" dst="dkms/$_srcname-$pkgver"
+  rm -rf dkms
+  install -d "$dst/ane"
+  cp -r "$src/dkms.conf" "$dst/"
+  cp -r "$src/ane/Makefile" "$src/ane/src" "$src/ane/t6021" "$dst/ane/"
+  sed -i "s/@PKGVER@/$pkgver/" "$dst/dkms.conf"
+}
+
+check() {
+  cd "$_srcname-$pkgver"
+  python tools/test_ane_dt.py
+  python tools/test_ane_firmware_fetch.py
+  python tools/test_ane_m2.py
+
+  local build=(/usr/lib/modules/*/build)
+  local kver=${build[0]%/build}
+  kver=${kver##*/}
+  rm -rf "$srcdir/check"
+  mkdir -p "$srcdir/check/dkms" "$srcdir/check/src"
+  local dkms_options=(--dkmstree "$srcdir/check/dkms" --sourcetree "$srcdir/check/src" -k "$kver")
+  fakeroot dkms "${dkms_options[@]}" add "$srcdir/dkms/$_srcname-$pkgver"
+  fakeroot dkms "${dkms_options[@]}" build "$_srcname/$pkgver"
+}
+
+package() {
+  cd "$_srcname-$pkgver"
+  install -d "$pkgdir/usr/src"
+  cp -r --no-preserve=ownership "$srcdir/dkms/$_srcname-$pkgver" "$pkgdir/usr/src/"
+
+  install -Dm755 -t "$pkgdir/usr/bin" \
+    packaging/omarchy-ane-check packaging/omarchy-ane-dt \
+    packaging/omarchy-ane-firmware-fetch packaging/omarchy-ane-m2-enable
+  install -Dm644 packaging/update-m1n1-dtbs "$pkgdir/usr/lib/omarchy-ane/update-m1n1-dtbs"
+  install -Dm644 -t "$pkgdir/usr/share/libalpm/hooks" \
+    packaging/90-omarchy-ane-dt.hook packaging/90-omarchy-ane-dt-remove.hook
+  install -Dm644 packaging/modprobe/ane_t6021.conf "$pkgdir/etc/modprobe.d/ane_t6021.conf"
+  # /usr/lib/omarchy-platform/dtb-overlays/PREFIX/omarchy-ane.dtbo
+  packaging/build-dtbo "$pkgdir"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

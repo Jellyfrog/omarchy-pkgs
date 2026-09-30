@@ -1,0 +1,12 @@
+# omarchy-ane-m2-enable writes these two files. pacman does not own them, so
+# remove them with the package, as omarchy-ane-m2-enable --disable does.
+post_remove() {
+  rm -f /usr/lib/firmware/apple/ane/t602x_ane0_fw_selene_rc4x.macho
+  rmdir /usr/lib/firmware/apple/ane 2>/dev/null || :
+
+  local opt_in=/etc/omarchy-platform/dtb-overlays.opt-in
+  if [[ -f $opt_in ]]; then
+    sed -i '/^ane-t6021$/d' "$opt_in"
+    [[ -s $opt_in ]] || rm -f "$opt_in"
+  fi
+}
