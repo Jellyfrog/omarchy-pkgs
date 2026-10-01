@@ -3,9 +3,9 @@
 pkgname=omarchy-mac-ml
 pkgver=1
 pkgrel=1
-pkgdesc='Local AI on Apple Silicon Macs: MLX, the Neural Engine driver and its compiler'
+pkgdesc='Local AI on Apple Silicon Macs: MLX on the GPU and Core ML models on the Neural Engine'
 arch=('aarch64')
 groups=('omarchy-platform-apple-silicon')
 url='https://github.com/omacom/omarchy-pkgs'
 license=('MIT')
-depends=('omarchy-mlx' 'omarchy-ane-dkms' 'mil-hwx-compiler')
+depends=('omarchy-mlx' 'omarchy-mlx-vulkan' 'omarchy-ane-dkms' 'mil-hwx-compiler')
