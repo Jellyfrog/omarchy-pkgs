@@ -23,7 +23,7 @@ provides=('omarchy-ane-abi=1')
 backup=('etc/modprobe.d/ane_t6021.conf')
 install=omarchy-ane-dkms.install
 source=("$_srcname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('4090db21dc679e8d90aab213030b030058fa2c6204cd90e533906cba76a1c8c9')
+sha256sums=('255e1cd93d2ba591d39430f67b49ce48c54079d5cb173764266afb4ef1bbf28d')
 
 prepare() {
   # The DKMS source tree: dkms.conf, ane/Makefile, ane/src/ and ane/t6021/.
