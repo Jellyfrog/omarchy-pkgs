@@ -19,8 +19,6 @@ optdepends=('linux-aurora-headers: build the modules for linux-aurora'
 # ANE_ABI_MAJOR of ane.ko (ane/src/uapi/drm/ane_accel.h). omarchy-mlx depends on
 # the ABI, not on a package version.
 provides=('omarchy-ane-abi=1')
-# ane_t6021 stays blocked until omarchy-ane-m2-enable edits this file.
-backup=('etc/modprobe.d/ane_t6021.conf')
 install=omarchy-ane-dkms.install
 source=("$_srcname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('255e1cd93d2ba591d39430f67b49ce48c54079d5cb173764266afb4ef1bbf28d')
@@ -59,12 +57,12 @@ package() {
 
   install -Dm755 -t "$pkgdir/usr/bin" \
     packaging/omarchy-ane-check packaging/omarchy-ane-dt \
-    packaging/omarchy-ane-firmware-fetch packaging/omarchy-ane-m2-enable
+    packaging/omarchy-ane-firmware-fetch
   install -Dm644 packaging/update-m1n1-dtbs "$pkgdir/usr/lib/omarchy-ane/update-m1n1-dtbs"
   install -Dm644 -t "$pkgdir/usr/share/libalpm/hooks" \
-    packaging/90-omarchy-ane-dt.hook packaging/90-omarchy-ane-dt-remove.hook
-  install -Dm644 packaging/modprobe/ane_t6021.conf "$pkgdir/etc/modprobe.d/ane_t6021.conf"
-  # /usr/lib/omarchy-platform/dtb-overlays/PREFIX/omarchy-ane.dtbo
+    packaging/90-omarchy-ane-dt.hook packaging/90-omarchy-ane-dt-remove.hook \
+    packaging/90-omarchy-ane-firmware.hook
+  # /usr/share/omarchy-platform/dtb-overlays/PREFIX/omarchy-NAME.dtbo
   packaging/build-dtbo "$pkgdir"
 
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
