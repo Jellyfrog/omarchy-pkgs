@@ -1,0 +1,11 @@
+# Maintainer: Joshua Warren <816217+joshuaswarren@users.noreply.github.com>
+
+pkgname=omarchy-mac-ml
+pkgver=1
+pkgrel=1
+pkgdesc='Local AI on Apple Silicon Macs: MLX, the Neural Engine driver and its compiler'
+arch=('aarch64')
+groups=('omarchy-platform-apple-silicon')
+url='https://github.com/omacom/omarchy-pkgs'
+license=('MIT')
+depends=('omarchy-mlx' 'omarchy-ane-dkms' 'mil-hwx-compiler')
