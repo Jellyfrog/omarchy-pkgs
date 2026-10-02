@@ -2,7 +2,7 @@
 
 pkgname=omarchy-ane-dkms
 _srcname=omarchy-ane
-pkgver=0.4.0
+pkgver=0.4.1
 pkgrel=1
 pkgdesc='Apple Neural Engine driver for Apple Silicon Macs (DKMS)'
 arch=('aarch64')
@@ -22,16 +22,18 @@ optdepends=('linux-aurora-headers: build the modules for linux-aurora'
 provides=('omarchy-ane-abi=1')
 install=omarchy-ane-dkms.install
 source=("$_srcname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('4061ae5c8531299c01519c03deeada4b1146c62a0809de1572534ca6c6ee562d')
+sha256sums=('c11bfe8eedb58d6284ef07cd7f3e46dfa513224cbe8bebf34477417574a3a343')
 
 prepare() {
-  # The DKMS source tree: dkms.conf, ane/Makefile, ane/src/ and ane/t6021/.
+  # The DKMS source tree: dkms.conf, ane/Makefile, ane/ane_stats_show.c,
+  # ane/include/, ane/src/ and ane/t6021/.
   # PACKAGE_VERSION becomes /sys/module/ane/version.
   local src="$_srcname-$pkgver" dst="dkms/$_srcname-$pkgver"
   rm -rf dkms
   install -d "$dst/ane"
   cp -r "$src/dkms.conf" "$dst/"
-  cp -r "$src/ane/Makefile" "$src/ane/src" "$src/ane/t6021" "$dst/ane/"
+  cp -r "$src/ane/Makefile" "$src/ane/ane_stats_show.c" "$src/ane/include" \
+    "$src/ane/src" "$src/ane/t6021" "$dst/ane/"
   sed -i "s/@PKGVER@/$pkgver/" "$dst/dkms.conf"
 }
 
@@ -45,6 +47,9 @@ check() {
   python tools/test_ane_firmware_fetch.py
   python tools/test_ane_m2.py
   python tools/test_ane_smoke.py
+  python tools/test_ane_probe.py
+  python tools/test_validate_ane_soc.py
+  python tools/test_promotion_check.py
 
   local build=(/usr/lib/modules/*/build)
   local kver=${build[0]%/build}
@@ -64,15 +69,20 @@ package() {
   install -Dm755 -t "$pkgdir/usr/bin" \
     packaging/omarchy-ane-check packaging/omarchy-ane-dt \
     packaging/omarchy-ane-firmware-fetch packaging/omarchy-ane-smoke
-  # omarchy-ane-smoke runs omarchy-ane-run from its own directory with this program.
+  install -Dm755 tools/omarchy-ane-probe "$pkgdir/usr/bin/omarchy-ane-probe"
+  # omarchy-ane-smoke runs omarchy-ane-run from its own directory with these programs.
   install -Dm755 tools/ane-run "$pkgdir/usr/bin/omarchy-ane-run"
   install -Dm644 fixtures/h14-anec/add/program-0.anec \
     "$pkgdir/usr/share/omarchy-ane/fixtures/h14-anec/add/program-0.anec"
+  install -Dm644 fixtures/h13-anec/add/program-0.anec \
+    "$pkgdir/usr/share/omarchy-ane/fixtures/h13-anec/add/program-0.anec"
   install -Dm644 packaging/update-m1n1-dtbs "$pkgdir/usr/lib/omarchy-ane/update-m1n1-dtbs"
   install -Dm644 -t "$pkgdir/usr/share/libalpm/hooks" \
     packaging/90-omarchy-ane-dt.hook packaging/90-omarchy-ane-dt-remove.hook \
     packaging/90-omarchy-ane-firmware.hook
-  # /usr/share/omarchy-platform/dtb-overlays/PREFIX/omarchy-NAME.dtbo
+  # Overlays to /usr/share/omarchy-platform/dtb-overlays/PREFIX/omarchy-NAME.dtbo,
+  # and data/ane-soc/SOC.json to /usr/share/omarchy-ane/soc/. The data-only
+  # overlays compile as a check and are never installed.
   packaging/build-dtbo "$pkgdir"
 
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
