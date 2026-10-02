@@ -18,7 +18,7 @@ makedepends=('clang' 'elfutils' 'expat' 'glslang' 'libclc' 'libdrm' 'llvm' 'meso
              'python' 'python-mako' 'python-packaging' 'python-yaml'
              'spirv-llvm-translator' 'spirv-tools' 'zstd')
 options=('!debug' '!lto')
-source=("mlx-omarchy-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz"
+source=("omarchy-mlx-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz"
         "$_wheel::$url/releases/download/v$pkgver/${_wheel//+/%2B}"
         "$_vendor::$url/releases/download/v$pkgver/$_vendor"
         "mesa-$_mesa_commit.tar.gz::https://github.com/joshuaswarren/mesa-1/archive/$_mesa_commit.tar.gz")
@@ -62,7 +62,7 @@ build() {
   DESTDIR="$srcdir/mesa-stage" meson install -C build-mesa
 
   # The system venv and launchers, built offline from the hash-locked wheels.
-  cd "mlx-omarchy-$pkgver"
+  cd "omarchy-mlx-$pkgver"
   MLX_OMARCHY_CONV_RING=0 bash install.sh --system \
     --dest-root "$srcdir/stage" \
     --vendor "$srcdir/vendor" \
