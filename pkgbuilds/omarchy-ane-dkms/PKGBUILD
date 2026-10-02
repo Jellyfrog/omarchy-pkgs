@@ -12,7 +12,8 @@ license=('GPL-2.0-only OR MIT')
 # dtc 1.7.1 is the first release that keeps a labelled node's phandle when it
 # applies an overlay (libfdt 1fad0650, 61e88fdc). Arch's dtc carries epoch 1.
 depends=('dkms' 'dtc>=1:1.7.1' 'python')
-makedepends=('dtc')
+# libdrm: drm.h for libane, which omarchy-ane-run links statically.
+makedepends=('dtc' 'libdrm')
 checkdepends=('fakeroot' 'linux-aurora-headers')
 optdepends=('linux-aurora-headers: build the modules for linux-aurora'
             'linux-asahi-headers: build the modules for linux-asahi')
@@ -34,11 +35,16 @@ prepare() {
   sed -i "s/@PKGVER@/$pkgver/" "$dst/dkms.conf"
 }
 
+build() {
+  make -C "$_srcname-$pkgver/tools" ane-run
+}
+
 check() {
   cd "$_srcname-$pkgver"
   python tools/test_ane_dt.py
   python tools/test_ane_firmware_fetch.py
   python tools/test_ane_m2.py
+  python tools/test_ane_smoke.py
 
   local build=(/usr/lib/modules/*/build)
   local kver=${build[0]%/build}
@@ -57,7 +63,11 @@ package() {
 
   install -Dm755 -t "$pkgdir/usr/bin" \
     packaging/omarchy-ane-check packaging/omarchy-ane-dt \
-    packaging/omarchy-ane-firmware-fetch
+    packaging/omarchy-ane-firmware-fetch packaging/omarchy-ane-smoke
+  # omarchy-ane-smoke runs omarchy-ane-run from its own directory with this program.
+  install -Dm755 tools/ane-run "$pkgdir/usr/bin/omarchy-ane-run"
+  install -Dm644 fixtures/h14-anec/add/program-0.anec \
+    "$pkgdir/usr/share/omarchy-ane/fixtures/h14-anec/add/program-0.anec"
   install -Dm644 packaging/update-m1n1-dtbs "$pkgdir/usr/lib/omarchy-ane/update-m1n1-dtbs"
   install -Dm644 -t "$pkgdir/usr/share/libalpm/hooks" \
     packaging/90-omarchy-ane-dt.hook packaging/90-omarchy-ane-dt-remove.hook \
