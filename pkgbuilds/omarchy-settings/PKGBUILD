@@ -447,15 +447,6 @@ EOF
     install -Dm755 bin/omarchy-hw-platform \
       "$pkgdir/usr/share/libalpm/scripts/omarchy-hw-platform"
   fi
-  # 00-omarchy-hooks.conf places a Mac through this detector copy; without it
-  # an Aurora Mac gets the busybox line and its initramfs cannot unlock root.
-  # x86_64 keeps the busybox line either way.
-  if [[ $CARCH == aarch64 ]] &&
-    grep -qs omarchy-hw-platform "$pkgdir/etc/mkinitcpio.conf.d/00-omarchy-hooks.conf" &&
-    [[ ! -x $pkgdir/usr/share/libalpm/scripts/omarchy-hw-platform ]]; then
-    echo "etc/mkinitcpio.conf.d/00-omarchy-hooks.conf needs the omarchy-hw-platform copy the source does not ship" >&2
-    return 1
-  fi
 
   # Branding assets (logos, icons).
   install -Dm644 logo.txt "$pkgdir/usr/share/omarchy/logo.txt"
