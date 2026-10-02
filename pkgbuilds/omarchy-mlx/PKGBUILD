@@ -2,13 +2,13 @@
 
 pkgbase=omarchy-mlx
 pkgname=(omarchy-mlx omarchy-mlx-vulkan)
-pkgver=0.7.14
+pkgver=0.7.17
 pkgrel=1
 arch=('aarch64')
 url='https://github.com/joshuaswarren/omarchy-mlx'
 # The two packages publish together, so the tested wheel and the Vulkan driver
 # it was qualified on can never skew.
-_wheel=mlx_omarchy-0.32.4.dev202610020636+07729f40-cp314-cp314-linux_aarch64.whl
+_wheel=mlx_omarchy-0.32.4.dev202610021526+a33a4e39-cp314-cp314-linux_aarch64.whl
 _vendor=omarchy-mlx-vendor-wheels-v$pkgver-cp314-aarch64.tar
 # The Honeykrisp Vulkan driver: joshuaswarren/mesa-1 honeykrisp-omarchy-v3.
 _mesa_commit=e7631595df6281748ea5e643d74db59c5f783b01
@@ -23,9 +23,9 @@ source=("omarchy-mlx-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz"
         "$_vendor::$url/releases/download/v$pkgver/$_vendor"
         "mesa-$_mesa_commit.tar.gz::https://github.com/joshuaswarren/mesa-1/archive/$_mesa_commit.tar.gz")
 noextract=("$_wheel" "$_vendor")
-sha256sums=('82174e1538dfb50f82b3b99d40a2b3c5fb3c3f17606ee205548f6e5c0744aa2e'
-            '60f175e0afde9568cd3e20eecca2e4daa03b54e85041619193ce2e3a7b8640a2'
-            '24a5bef313eeb6b25345c34e907f8ff2737a31fe2ae373f49bb7209074adac16'
+sha256sums=('35d578fb28e9e7ccf739f96a033c7ac334d4d22bf14383a4b0abc1558c63131a'
+            'fc97558bbce2f11839af972ceb3d25b81f026aa8d1a43bd01fd99720219ce520'
+            'e9885a5226c2cd77a48250c17362d7a9d7ad15eea92bb43b4a977c09a4503119'
             'ae00b9568f1c57a7be7518b6f508354bc86c4494d83a82ef79bd0a799835c4b2')
 
 prepare() {
@@ -73,6 +73,9 @@ check() {
   grep -aq "(git-$_mesa_sha)" "$srcdir/mesa-stage/usr/lib/libvulkan_asahi.so"
   "$srcdir/stage/usr/lib/omarchy-mlx/venv/bin/python" \
     -c 'import mlx.core, mlx_omarchy_paths, mlx_omarchy_serve'
+  # Refuse a stage whose ANE bytes disagree with the wheel's runtime pin.
+  python3 "$srcdir/omarchy-mlx-$pkgver/scripts/verify_runtime_assets.py" \
+    "$srcdir/stage/usr/lib/omarchy-mlx/venv/lib/python3.14/site-packages/mlx/share/mlx-omarchy/parakeet-1"
 }
 
 package_omarchy-mlx() {
