@@ -217,19 +217,15 @@ split=$scratch/split/omarchy
 mkdir -p "$scratch/split"
 cp -a "$fixture" "$split"
 cp "$fixtures"/omarchy-13362/*.conf "$split/etc/mkinitcpio.conf.d/"
-# Its 00-omarchy-hooks.conf asks the detector copy the platform guard ships.
-for path in default/libalpm/hooks/00-omarchy-platform-guard.hook \
-  default/libalpm/scripts/omarchy-platform-guard bin/omarchy-hw-platform; do
-  mkdir -p "$(dirname "$split/$path")"
-  printf 'fixture for %s\n' "$path" > "$split/$path"
-done
+# Its 00-omarchy-hooks.conf asks the runtime's own detector (omarchy-hw-platform
+# on PATH), so the package builds without a copy of it and ships none.
 for recipe in omarchy-settings omarchy-settings-dev; do
   package_aarch64 "$recipe" "$split" "$scratch/split-$recipe" >/dev/null
   for conf in 00-omarchy-hooks.conf omarchy_hooks.conf; do
     cmp "$fixtures/omarchy-13362/$conf" "$scratch/split-$recipe/etc/mkinitcpio.conf.d/$conf"
   done
   grep -Fxq etc/mkinitcpio.conf.d/00-omarchy-hooks.conf "$scratch/split-$recipe.backup"
-  [[ -x $scratch/split-$recipe/usr/share/libalpm/scripts/omarchy-hw-platform ]]
+  [[ ! -e $scratch/split-$recipe/usr/share/libalpm/scripts/omarchy-hw-platform ]]
 done
 layout="omacom/omarchy#13362 (00-omarchy-hooks.conf)"
 packaged=$scratch/split-omarchy-settings/etc/mkinitcpio.conf.d
@@ -275,8 +271,6 @@ refuse "a hooks file that sets no HOOKS" "$unsafe" omarchy_hooks.conf 'FILES+=(/
 refuse "a HOOKS line with a trailing comment" "$unguardable" omarchy_hooks.conf "HOOKS=($omarchy_hooks) # local"
 refuse "a HOOKS line split over lines" "$unguardable" omarchy_hooks.conf "HOOKS=(base udev"$'\n'"  block encrypt filesystems)"
 refuse "an indented HOOKS that ignores asahi" "$unsafe" 00-omarchy-hooks.conf "if true; then"$'\n'"  HOOKS=($omarchy_hooks)"$'\n'"fi"
-refuse "#13362's hooks without the platform detector" "needs the omarchy-hw-platform copy" \
-  00-omarchy-hooks.conf "$(cat "$fixtures/omarchy-13362/00-omarchy-hooks.conf")"
 
 # Upgrades: pacman replaces an unmodified hooks file, keeps a modified one and
 # leaves the guarded version as .pacnew, and installs it where it was absent.

@@ -13,7 +13,7 @@ pkgname='omarchy-settings'
 _tag='v4.0.4'
 _commit='c668141e9c42b13c80c9ca4ea108e11708c5e8a5'
 pkgver=4.0.4
-pkgrel=4
+pkgrel=5
 pkgdesc='Omarchy user defaults, /etc/skel content, fonts, plymouth theme, and support helpers'
 # Arch-specific because the shipped /etc tree is not the same on every
 # architecture for older sources: their zram and oomd drop-ins belong to the
@@ -446,15 +446,6 @@ EOF
       "$pkgdir/usr/share/libalpm/scripts/omarchy-platform-guard"
     install -Dm755 bin/omarchy-hw-platform \
       "$pkgdir/usr/share/libalpm/scripts/omarchy-hw-platform"
-  fi
-  # 00-omarchy-hooks.conf places a Mac through this detector copy; without it
-  # an Aurora Mac gets the busybox line and its initramfs cannot unlock root.
-  # x86_64 keeps the busybox line either way.
-  if [[ $CARCH == aarch64 ]] &&
-    grep -qs omarchy-hw-platform "$pkgdir/etc/mkinitcpio.conf.d/00-omarchy-hooks.conf" &&
-    [[ ! -x $pkgdir/usr/share/libalpm/scripts/omarchy-hw-platform ]]; then
-    echo "etc/mkinitcpio.conf.d/00-omarchy-hooks.conf needs the omarchy-hw-platform copy the source does not ship" >&2
-    return 1
   fi
 
   # Branding assets (logos, icons).
