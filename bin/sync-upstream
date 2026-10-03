@@ -1044,6 +1044,9 @@ EOF
   if ! bash "$BUILD_ROOT/pkgbuilds/cua-driver-bin/.omarchy/upstream-test.sh"; then
     failures=$((failures + 1))
   fi
+  if ! bash "$BUILD_ROOT/pkgbuilds/tmog-bin/.omarchy/upstream-test.sh"; then
+    failures=$((failures + 1))
+  fi
 
   echo ""
   if [[ "$failures" -eq 0 ]]; then

@@ -6,8 +6,8 @@
 # Omarchy already installs.
 #
 # .omarchy/upstream.sh rewrites the pkgver and sha256 below when
-# /rtm/version.txt moves, taking the checksum from the .sha256 sidecar tmog.org
-# publishes beside each versioned tarball.
+# the Linux x86_64 release manifest moves, taking the checksum from the .sha256
+# sidecar tmog.org publishes beside each versioned tarball.
 
 pkgname=tmog-bin
 pkgver=1.0.0
