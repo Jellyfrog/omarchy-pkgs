@@ -2,7 +2,7 @@
 
 pkgname=omarchy-ane-dkms
 _srcname=omarchy-ane
-pkgver=0.4.1
+pkgver=0.4.2
 pkgrel=1
 pkgdesc='Apple Neural Engine driver for Apple Silicon Macs (DKMS)'
 arch=('aarch64')
@@ -22,7 +22,7 @@ optdepends=('linux-aurora-headers: build the modules for linux-aurora'
 provides=('omarchy-ane-abi=1')
 install=omarchy-ane-dkms.install
 source=("$_srcname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('c11bfe8eedb58d6284ef07cd7f3e46dfa513224cbe8bebf34477417574a3a343')
+sha256sums=('c26179882e1e78b446c8062a9826acca1776130f452ae970fd1fc9ca150a9566')
 
 prepare() {
   # The DKMS source tree: dkms.conf, ane/Makefile, ane/ane_stats_show.c,
