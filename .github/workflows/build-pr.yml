@@ -226,6 +226,18 @@ jobs:
           if [[ -n "$plan" && -z "$(sed -E 's/.*would build: *//' <<<"$plan" | tr -d '[:space:]')" ]]; then
             echo "==> ${{ matrix.package }} (${{ matrix.arch }}): edge already holds this version, nothing to build"
             echo "built=false" >> "$GITHUB_OUTPUT"
+            # Arch bumps pkgrel only when the built package changes, which is
+            # the reviewer's call. When the recipe itself changed (comments and
+            # blank lines aside), flag it on the PKGBUILD without failing: the
+            # change ships only once pkgver or pkgrel moves. HEAD is the base
+            # branch; the PR's package directories are overlaid on it.
+            recipe="pkgbuilds/${{ matrix.package }}/PKGBUILD"
+            recipe_lines() { grep -vE '^[[:space:]]*(#|$)' || true; }
+            if ! cmp -s <(git show "HEAD:$recipe" 2>/dev/null | recipe_lines) <(recipe_lines < "$recipe"); then
+              note="PKGBUILD changed, but edge already holds this version of ${{ matrix.package }}, so the change will not ship until pkgver or pkgrel changes. Bump pkgrel if it affects the built package."
+              echo "::warning file=$recipe,title=Change will not ship::$note"
+              echo "$note" >> "$GITHUB_STEP_SUMMARY"
+            fi
             exit 0
           fi
           bin/build --mirror edge --arch "${{ matrix.arch }}" --package "${{ matrix.package }}"
