@@ -1,5 +1,5 @@
 pkgname=omakade
-pkgver=1.14.2
+pkgver=1.15.0
 pkgrel=1
 pkgdesc='A beautiful, local-first game library for Omarchy'
 arch=('x86_64' 'aarch64')
@@ -13,7 +13,7 @@ optdepends=('libpulse: switch Game Mode sound outputs with pactl'
 makedepends=('cmake' 'ninja' 'pkgconf' 'wayland-protocols')
 options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/btsouth/omakade/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('eaa80d3604ab0d090e3bc958cc8e815b94e3fd1216bf5d478eabccea04aa380d')
+sha256sums=('cb5bfd208a151f6071956555c6afd93efc04a0490e951523bf5ec7d0f5e2b982')
 
 build() {
   cmake -S "$pkgname-$pkgver" -B build -G Ninja \
