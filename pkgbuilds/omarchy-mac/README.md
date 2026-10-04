@@ -12,7 +12,7 @@ Installing the package enables no system services, but its vendor configuration 
 
 `depends` carries what every Mac needs, so an offline first boot has it and an owner can't remove it: the speaker stack with `speakersafetyd` named (its unit is this package's preset), `alsa-ucm-conf-asahi`, `rtkit`, `pipewire-alsa`, `pipewire-pulse`, `vulkan-asahi` and `asahi-alarm-keyring` (the keyring of the `[asahi-alarm]` repository, named in the platform root's `keyrings`). avd-fw, libva-v4l2_request-avd, wf-recorder and widevine stay out: they are removable defaults in the runtime's Apple package list. Runtime dependencies are declared in `package()`, so the builder stages and tests the add-on without installing the desktop.
 
-## What 0.1.0-11 drops
+## What 0.1.0-11 and later drop
 
 From omacom/omarchy-mac-pkgs the package no longer ships the fork's `legacy/` copies (`/usr/share/omarchy-mac/legacy`) or the setup that retired them; pacman removes them on upgrade. The Apple pacman templates, the `omarchy-hw-apple` alias, the copies under `/usr/share/omarchy` and the platform Hyprland files that lab candidates 0.1.0-7 to 0.1.0-10 carried are gone too: Omarchy from omacom/omarchy#13362 owns the templates and the detector, and the Hyprland defaults wait for a core slot. Converting a fork or mx-mac Mac is a separate migration script, not this package.
 
@@ -29,4 +29,4 @@ Updates are reviewed pins, never a branch. To release a change to the add-on:
 2. Reset `pkgrel` to 1 when `pkgver` increases; bump it to re-pin or rebuild the same version.
 3. Refresh `sha256sums` with `makepkg -g`.
 
-Commits that touch only `omarchy-mac-boot/`, the manual or the tools do not need a new pin. `0.1.0-11` sorts above edge's `0.1.0-6` and every lab candidate up to `0.1.0-10`.
+Commits that touch only `omarchy-mac-boot/`, the manual or the tools do not need a new pin. `0.1.0-12` sorts above edge's `0.1.0-6`, the first draft of this pin (`0.1.0-11`) and every lab candidate up to `0.1.0-10`.
