@@ -8,7 +8,7 @@ pkgname=omarchy-mac-boot
 # 20260921-N. Reset pkgrel to 1 when pkgver changes; bump it to re-pin or
 # rebuild on the same day.
 pkgver=20261004
-pkgrel=2
+pkgrel=3
 pkgdesc='Apple Silicon boot support for Omarchy: initramfs, in-place encryption, first boot and Limine activation'
 arch=('aarch64')
 groups=('omarchy-platform-apple-silicon')
@@ -22,9 +22,9 @@ conflicts=('omarchy-apple-boot' 'omarchy-first-boot')
 replaces=('omarchy-apple-boot' 'omarchy-first-boot')
 install=omarchy-mac-boot.install
 # An exact omarchy-mac-pkgs main commit, never a branch.
-_commit=2a3ed89eb20c5695f6291698b6646a49f8f6489d
+_commit=6bd123a6790e33e0ccb7ab09ac4eee7815c9a95b
 source=("omarchy-mac-pkgs::git+https://github.com/omacom/omarchy-mac-pkgs.git#commit=${_commit}")
-sha256sums=('ab951984268adadff8352009f63f1b001c3b09d14d47454b9efe06a54b3019ab')
+sha256sums=('6af86c533129815653377731516cf5411fdd4f40e217687a8113ae33fc42c19f')
 
 prepare() {
   # Tests and staging must not be able to read the other package's tree.
