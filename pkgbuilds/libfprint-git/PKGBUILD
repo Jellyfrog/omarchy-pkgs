@@ -10,6 +10,9 @@
 # On aarch64 it also carries the aurora driver for Apple Touch ID, which the
 # aurora kernel's Secure Enclave driver exposes as /dev/sep-bio
 # (aurora-apple-sep.patch, by Chris Kearney). The x86_64 build is unchanged.
+# The driver accepts only /dev/sep-bio interface version 4
+# (AURORA_BIO_IFACE_VERSION): a kernel that bumps it turns Touch ID off until
+# this patch follows, so move the two together.
 
 pkgname=libfprint-git
 pkgver=1.94.100.r10.g6f9479c
@@ -56,7 +59,7 @@ b2sums=(
   'SKIP'
   'SKIP'
 )
-b2sums_aarch64=('SKIP')
+b2sums_aarch64=('ec577996066baf6db6d741763abd681aae5556d52a8b67f7a52a60a4df7015c5d1edf3637835e563b2fb0edde2499173d61c50717b621f6bddf94a1f700075e5')
 
 pkgver() {
   cd libfprint
@@ -74,8 +77,11 @@ prepare() {
     patch -p1 < "$srcdir/focaltech_moc-add-pid-0xA97A.patch"
   fi
 
-  if [[ $CARCH == "aarch64" && ! -f libfprint/drivers/aurora/aurora.c ]]; then
-    patch -p1 < "$srcdir/aurora-apple-sep.patch"
+  # Skipped only when every hunk is already in: a tree a failed run left
+  # half-patched fails here instead of building.
+  if [[ $CARCH == "aarch64" ]] &&
+    ! patch -p1 -R --dry-run --silent --force < "$srcdir/aurora-apple-sep.patch" >/dev/null 2>&1; then
+    patch -p1 --forward < "$srcdir/aurora-apple-sep.patch"
   fi
 }
 
