@@ -254,6 +254,9 @@ package() {
   # omacom/omarchy#13362 moves the HOOKS baseline into its own drop-in.
   [[ ! -f $pkgdir/etc/mkinitcpio.conf.d/00-omarchy-hooks.conf ]] ||
     backup+=('etc/mkinitcpio.conf.d/00-omarchy-hooks.conf')
+  # Older sources do not have this file. Add it to backup only when it exists.
+  [[ ! -f $pkgdir/etc/makepkg.conf.d/zz-omarchy.conf ]] ||
+    backup+=('etc/makepkg.conf.d/zz-omarchy.conf')
   if [[ $CARCH == aarch64 ]]; then
     # Keep omarchy_hooks.conf and the Limine entry-tool config: without them a
     # kernel update on an encrypted aarch64 install rebuilds an initramfs with
